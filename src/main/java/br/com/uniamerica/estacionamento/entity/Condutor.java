@@ -14,10 +14,10 @@ public class Condutor extends AbstractEntity {
     @Column(name = "nome",nullable = false, length = 100)
     private String nome;
     @Getter @Setter
-    @Column(name = "cpf",nullable = true, length = 15)
+    @Column(name = "cpf",nullable = false, length = 15)
     private String cpf;
     @Getter @Setter
-    @Column(name = "telefone",nullable = true, length = 17)
+    @Column(name = "telefone",nullable = false, length = 17)
     private String telefone;
     @Getter @Setter
     @Column(name = "tempogasto")
