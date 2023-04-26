@@ -6,7 +6,11 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalTime;
+//import org.hibernate.envers.AuditTable;
+//import org.hibernate.envers.Audited;
 @Entity
+//@Audited
+//@AuditTable(name="condutores-audity", schema = "audit")
 @Table(name = "condutores", schema = "public")
 public class Condutor extends AbstractEntity {
 
