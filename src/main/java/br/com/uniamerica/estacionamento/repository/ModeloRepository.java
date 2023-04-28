@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface ModeloRepository extends JpaRepository<Modelo, Long> {
-    @Query(value = "SELECT  FROM Modelo  WHERE ativo = 1",nativeQuery = true)
+    @Query(value = "SELECT  FROM tb_modelo  WHERE ativo = 1",nativeQuery = true)
     public List<Modelo> findByAtivo();
 }

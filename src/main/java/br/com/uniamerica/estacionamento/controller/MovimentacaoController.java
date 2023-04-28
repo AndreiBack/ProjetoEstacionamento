@@ -46,11 +46,11 @@ public class MovimentacaoController {
 
         return ResponseEntity.ok(Movimentacao);
     }
-    @GetMapping("/ativos")
-    public ResponseEntity<?> findByAtivo(){
-        final List<Movimentacao> modelos = this.movimentacaoRepository.findByAtivo();
+    @GetMapping("/abertos")
+    public ResponseEntity<?> findByAberto(){
+        final List<Movimentacao> movimentacao = this.movimentacaoRepository.findBySaidaIsNull();
 
-        return ResponseEntity.ok(modelos);
+        return ResponseEntity.ok(movimentacao);
     }
 
     @PostMapping
