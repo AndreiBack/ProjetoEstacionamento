@@ -1,10 +1,9 @@
 package br.com.uniamerica.estacionamento.controller;
 
-import br.com.uniamerica.estacionamento.entity.Condutor;
+import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.entity.Modelo;
-import br.com.uniamerica.estacionamento.entity.Veiculo;
+import br.com.uniamerica.estacionamento.repository.MarcaRepository;
 import br.com.uniamerica.estacionamento.repository.ModeloRepository;
-import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -13,49 +12,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @Controller
-@RequestMapping(value = "/api/modelo")
-public class ModeloController {
+@RequestMapping(value = "/api/marca")
+public class MarcaController {
 
     @Autowired
+    private br.com.uniamerica.estacionamento.repository.MarcaRepository MarcaRepository;
     private ModeloRepository modeloRepository;
-    private VeiculoRepository veiculoRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdPath(@PathVariable("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-        return modelo == null
+        final Marca Marca = this.MarcaRepository.findById(id).orElse(null);
+        return Marca == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
+                : ResponseEntity.ok(Marca);
         //return ResponseEntity.ok(new Modelo());
     }
 
     @GetMapping
     public ResponseEntity<?> findByIdRequest(@RequestParam("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
+        final Marca Marca = this.MarcaRepository.findById(id).orElse(null);
 
-        return modelo == null
+        return Marca == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
-    }
-    @GetMapping("/ativos")
-    public ResponseEntity<?> findByAtivo(){
-        final List<Modelo> modelos = this.modeloRepository.findByAtivo();
-
-        return ResponseEntity.ok(modelos);
+                : ResponseEntity.ok(Marca);
     }
 
     @GetMapping("/lista")
     public ResponseEntity<?> findAll() {
-        final List<Modelo> modelo = this.modeloRepository.findAll();
+        final List<Marca> Marca = this.MarcaRepository.findAll();
 
-        return ResponseEntity.ok(modelo);
+        return ResponseEntity.ok(Marca);
+    }
+    @GetMapping("/ativos")
+    public ResponseEntity<?> findByAtivo(){
+        final List<Marca> marcas = this.MarcaRepository.findByAtivo();
+
+        return ResponseEntity.ok(marcas);
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo) {
+    public ResponseEntity<?> cadastrar(@RequestBody final Marca Marca) {
         try {
-            this.modeloRepository.save(modelo);
+            this.MarcaRepository.save(Marca);
             return ResponseEntity.ok("Registro cadastrado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
@@ -63,15 +63,15 @@ public class ModeloController {
     }
 
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Marca Marca) {
         try {
-            final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
+            final Marca MarcaBanco = this.MarcaRepository.findById(id).orElse(null);
 
-            if (modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())) {
+            if (MarcaBanco == null || !MarcaBanco.getId().equals(Marca.getId())) {
                 throw new RuntimeException("Não foi possível identificar o registro informado");
             }
 
-            this.modeloRepository.save(modelo);
+            this.MarcaRepository.save(Marca);
             return ResponseEntity.ok("Registro editado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error " + e.getCause().getCause().getMessage());
@@ -84,23 +84,23 @@ public class ModeloController {
     @DeleteMapping
     public ResponseEntity<?> excluir(@RequestParam("id") final Long id){
         try {
-            final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-            if(modelo == null){
+            final Marca marca = this.MarcaRepository.findById(id).orElse(null);
+            if(marca == null){
                 throw new Exception("Registro inexistente");
             }
 
-            final List<Veiculo> veiculos = this.veiculoRepository.findAll();
+            final List<Modelo> modelos = this.modeloRepository.findAll();
 
-            for(Veiculo veiculo : veiculos){
-                if(modelo.equals(veiculo.getModelo())){
-                    modelo.setAtivo(false);
-                    this.modeloRepository.save(modelo);
+            for(Modelo modelo : modelos){
+                if(marca.equals(modelo.getMarca())){
+                    marca.setAtivo(false);
+                    this.MarcaRepository.save(marca);
                     return ResponseEntity.ok("Registro não está mais ativo");
                 }
             }
 
-            if(modelo.isAtivo()){
-                this.modeloRepository.delete(modelo);
+            if(marca.isAtivo()){
+                this.MarcaRepository.delete(marca);
                 return ResponseEntity.ok("Registro deletado com sucesso");
             }
             else{
@@ -108,11 +108,10 @@ public class ModeloController {
             }
         }
         catch (Exception e){
-            return ResponseEntity.internalServerError().body("Error" + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error " + e.getMessage());
         }
     }
-    }
-
+}
 
 
 

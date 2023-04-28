@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public interface MarcaRepository extends JpaRepository<Marca, Long> {
+    List<Marca> findByAtivo();
 }

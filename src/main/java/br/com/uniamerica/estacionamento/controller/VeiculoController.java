@@ -1,9 +1,8 @@
 package br.com.uniamerica.estacionamento.controller;
 
-import br.com.uniamerica.estacionamento.entity.Condutor;
-import br.com.uniamerica.estacionamento.entity.Modelo;
+import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
-import br.com.uniamerica.estacionamento.repository.ModeloRepository;
+import br.com.uniamerica.estacionamento.repository.MovimentacaoRepository;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,49 +12,51 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @Controller
-@RequestMapping(value = "/api/modelo")
-public class ModeloController {
+@RequestMapping(value = "/api/veiculo")
+public class VeiculoController {
 
     @Autowired
-    private ModeloRepository modeloRepository;
-    private VeiculoRepository veiculoRepository;
+    private br.com.uniamerica.estacionamento.repository.VeiculoRepository VeiculoRepository;
+    private MovimentacaoRepository movimentacaoRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdPath(@PathVariable("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-        return modelo == null
+        final Veiculo Veiculo = this.VeiculoRepository.findById(id).orElse(null);
+        return Veiculo == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
+                : ResponseEntity.ok(Veiculo);
         //return ResponseEntity.ok(new Modelo());
     }
 
     @GetMapping
     public ResponseEntity<?> findByIdRequest(@RequestParam("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
+        final Veiculo Veiculo = this.VeiculoRepository.findById(id).orElse(null);
 
-        return modelo == null
+        return Veiculo == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
-    }
-    @GetMapping("/ativos")
-    public ResponseEntity<?> findByAtivo(){
-        final List<Modelo> modelos = this.modeloRepository.findByAtivo();
-
-        return ResponseEntity.ok(modelos);
+                : ResponseEntity.ok(Veiculo);
     }
 
     @GetMapping("/lista")
     public ResponseEntity<?> findAll() {
-        final List<Modelo> modelo = this.modeloRepository.findAll();
+        final List<Veiculo> Veiculo = this.VeiculoRepository.findAll();
 
-        return ResponseEntity.ok(modelo);
+        return ResponseEntity.ok(Veiculo);
+    }
+
+    @GetMapping("/ativos")
+    public ResponseEntity<?> findByAtivo(){
+        final List<Veiculo> veiculos = this.VeiculoRepository.findByAtivo();
+
+        return ResponseEntity.ok(veiculos);
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo) {
+    public ResponseEntity<?> cadastrar(@RequestBody final Veiculo Veiculo) {
         try {
-            this.modeloRepository.save(modelo);
+            this.VeiculoRepository.save(Veiculo);
             return ResponseEntity.ok("Registro cadastrado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
@@ -63,15 +64,15 @@ public class ModeloController {
     }
 
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Veiculo Veiculo) {
         try {
-            final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
+            final Veiculo VeiculoBanco = this.VeiculoRepository.findById(id).orElse(null);
 
-            if (modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())) {
+            if (VeiculoBanco == null || !VeiculoBanco.getId().equals(Veiculo.getId())) {
                 throw new RuntimeException("Não foi possível identificar o registro informado");
             }
 
-            this.modeloRepository.save(modelo);
+            this.VeiculoRepository.save(Veiculo);
             return ResponseEntity.ok("Registro editado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error " + e.getCause().getCause().getMessage());
@@ -84,23 +85,22 @@ public class ModeloController {
     @DeleteMapping
     public ResponseEntity<?> excluir(@RequestParam("id") final Long id){
         try {
-            final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-            if(modelo == null){
+            final Veiculo veiculo = this.VeiculoRepository.findById(id).orElse(null);
+            if(veiculo == null){
                 throw new Exception("Registro inexistente");
             }
 
-            final List<Veiculo> veiculos = this.veiculoRepository.findAll();
-
-            for(Veiculo veiculo : veiculos){
-                if(modelo.equals(veiculo.getModelo())){
-                    modelo.setAtivo(false);
-                    this.modeloRepository.save(modelo);
+            final List<Movimentacao> movimentacaos = this.movimentacaoRepository.findAll();
+            for(Movimentacao movimentacao : movimentacaos){
+                if(veiculo.equals(movimentacao.getVeiculo())){
+                    veiculo.setAtivo(false);
+                    this.VeiculoRepository.save(veiculo);
                     return ResponseEntity.ok("Registro não está mais ativo");
                 }
             }
 
-            if(modelo.isAtivo()){
-                this.modeloRepository.delete(modelo);
+            if(veiculo.isAtivo()){
+                this.VeiculoRepository.delete(veiculo);
                 return ResponseEntity.ok("Registro deletado com sucesso");
             }
             else{
@@ -111,8 +111,7 @@ public class ModeloController {
             return ResponseEntity.internalServerError().body("Error" + e.getMessage());
         }
     }
-    }
 
 
 
-
+}

@@ -1,10 +1,9 @@
 package br.com.uniamerica.estacionamento.controller;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
-import br.com.uniamerica.estacionamento.entity.Modelo;
-import br.com.uniamerica.estacionamento.entity.Veiculo;
-import br.com.uniamerica.estacionamento.repository.ModeloRepository;
-import br.com.uniamerica.estacionamento.repository.VeiculoRepository;
+import br.com.uniamerica.estacionamento.entity.Movimentacao;
+import br.com.uniamerica.estacionamento.repository.CondutorRepository;
+import br.com.uniamerica.estacionamento.repository.MovimentacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -12,50 +11,53 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping(value = "/api/modelo")
-public class ModeloController {
+@RequestMapping(value = "/api/condutor")
+public class CondutorController {
 
     @Autowired
-    private ModeloRepository modeloRepository;
-    private VeiculoRepository veiculoRepository;
+    private CondutorRepository condutorRepository;
+    @Autowired
+    private MovimentacaoRepository movimentacaoRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdPath(@PathVariable("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-        return modelo == null
+        final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
+        return condutor == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
+                : ResponseEntity.ok(condutor);
         //return ResponseEntity.ok(new Modelo());
     }
 
     @GetMapping
     public ResponseEntity<?> findByIdRequest(@RequestParam("id") final Long id) {
-        final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
+        final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
 
-        return modelo == null
+        return condutor == null
                 ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
-                : ResponseEntity.ok(modelo);
-    }
-    @GetMapping("/ativos")
-    public ResponseEntity<?> findByAtivo(){
-        final List<Modelo> modelos = this.modeloRepository.findByAtivo();
-
-        return ResponseEntity.ok(modelos);
+                : ResponseEntity.ok(condutor);
     }
 
     @GetMapping("/lista")
     public ResponseEntity<?> findAll() {
-        final List<Modelo> modelo = this.modeloRepository.findAll();
+        final List<Condutor> condutor = this.condutorRepository.findAll();
 
-        return ResponseEntity.ok(modelo);
+        return ResponseEntity.ok(condutor);
+    }
+    @GetMapping("/ativos")
+    public ResponseEntity<?> findByAtivo(){
+        final List<Condutor> condutores = this.condutorRepository.findByAtivo();
+
+        return ResponseEntity.ok(condutores);
     }
 
+
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo) {
+    public ResponseEntity<?> cadastrar(@RequestBody final Condutor condutor) {
         try {
-            this.modeloRepository.save(modelo);
+            this.condutorRepository.save(condutor);
             return ResponseEntity.ok("Registro cadastrado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
@@ -63,15 +65,15 @@ public class ModeloController {
     }
 
     @PutMapping
-    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Modelo modelo) {
+    public ResponseEntity<?> editar(@RequestParam("id") final Long id, @RequestBody final Condutor condutor) {
         try {
-            final Modelo modeloBanco = this.modeloRepository.findById(id).orElse(null);
+            final Condutor condutorBanco = this.condutorRepository.findById(id).orElse(null);
 
-            if (modeloBanco == null || !modeloBanco.getId().equals(modelo.getId())) {
+            if (condutorBanco == null || !condutorBanco.getId().equals(condutor.getId())) {
                 throw new RuntimeException("Não foi possível identificar o registro informado");
             }
 
-            this.modeloRepository.save(modelo);
+            this.condutorRepository.save(condutor);
             return ResponseEntity.ok("Registro editado com sucesso");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error " + e.getCause().getCause().getMessage());
@@ -84,23 +86,22 @@ public class ModeloController {
     @DeleteMapping
     public ResponseEntity<?> excluir(@RequestParam("id") final Long id){
         try {
-            final Modelo modelo = this.modeloRepository.findById(id).orElse(null);
-            if(modelo == null){
+            final Condutor condutor = this.condutorRepository.findById(id).orElse(null);
+            if(condutor == null){
                 throw new Exception("Registro inexistente");
             }
 
-            final List<Veiculo> veiculos = this.veiculoRepository.findAll();
-
-            for(Veiculo veiculo : veiculos){
-                if(modelo.equals(veiculo.getModelo())){
-                    modelo.setAtivo(false);
-                    this.modeloRepository.save(modelo);
+            final List<Movimentacao> movimentacaoL = movimentacaoRepository.findAll();
+            for(Movimentacao movimentacao : movimentacaoL){
+                if(condutor.equals(movimentacao.getCondutor())){
+                    condutor.setAtivo(false);
+                    this.condutorRepository.save(condutor);
                     return ResponseEntity.ok("Registro não está mais ativo");
                 }
             }
 
-            if(modelo.isAtivo()){
-                this.modeloRepository.delete(modelo);
+            if(condutor.isAtivo()){
+                this.condutorRepository.delete(condutor);
                 return ResponseEntity.ok("Registro deletado com sucesso");
             }
             else{
@@ -111,8 +112,7 @@ public class ModeloController {
             return ResponseEntity.internalServerError().body("Error" + e.getMessage());
         }
     }
-    }
-
+}
 
 
 

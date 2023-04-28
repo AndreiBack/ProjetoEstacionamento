@@ -2,7 +2,7 @@ drop  table tb_marca CASCADE;
 drop  table tb_modelo  CASCADE;
 drop  table tb_veiculo CASCADE;
 drop  table tb_condutor CASCADE;
-drop  table tb_configuracao CASCADE;
+drop  table tb_Movimentacao CASCADE;
 drop  table tb_movimentacao CASCADE;
 
 create table tb_marca(
@@ -77,7 +77,7 @@ insert into tb_condutor(nome, cpf, telefone, tempoPago, tempoDesconto) values ('
 insert into tb_condutor(nome, cpf, telefone, tempoPago, tempoDesconto) values ('Pedrin', '120.521.645-11', '+45 6842-974','100 hours', '10 hours');
 insert into tb_condutor(nome, cpf, telefone) values ('Pedrin', '120.521.622-98', '+45 6842-974');
 
-create table tb_configuracao(
+create table tb_Movimentacao(
 	id serial,
 	valorHora numeric,
 	valorMinutoMulta numeric,
@@ -88,14 +88,14 @@ create table tb_configuracao(
 	vagasCarro integer,
 	vagasVan integer
 );
-insert into tb_configuracao(valorhora, valorMinutoMulta, fimExpediente, tempoParaDesconto,gerarDesconto,vagasMoto,vagasCarro,vagasVan)
+insert into tb_Movimentacao(valorhora, valorMinutoMulta, fimExpediente, tempoParaDesconto,gerarDesconto,vagasMoto,vagasCarro,vagasVan)
 values (20,1,'2023-03-29 23:00:00','50 hours','no',10,15,8);
 
-select * from tb_configuracao;
+select * from tb_Movimentacao;
  
 create table tb_movimentacao(
 	id serial,
-	configuracao_id integer not null,
+	Movimentacao_id integer not null,
 	veiculo_id integer not null,
 	condutor_id integer not null,
 	entrada Timestamp,
@@ -123,20 +123,20 @@ create table tb_movimentacao(
 	alter table tb_modelo add foreign key (marca_id) references tb_marca(id);
 	alter table tb_veiculo add foreign key (modelo_id) references tb_modelo (id);
 	alter table tb_movimentacao add foreign key (veiculo_id) references tb_veiculo(id);
-	alter table tb_movimentacao add foreign key (configuracao_id) references tb_movimentacao(id);
+	alter table tb_movimentacao add foreign key (Movimentacao_id) references tb_movimentacao(id);
 	alter table tb_movimentacao add foreign key (condutor_id) references tb_condutor(id);
 
-	insert into tb_movimentacao(veiculo_id, condutor_id,configuracao_id ,entrada,saida,tempoMulta,tempoDesconto,
+	insert into tb_movimentacao(veiculo_id, condutor_id,Movimentacao_id ,entrada,saida,tempoMulta,tempoDesconto,
 			valorDesconto,valorHoraMulta) values (1,1,1,'2023-01-02 14:30:00','2023-01-02 22:00:00',
 			'0 hours','0 hours',0,0);
 			
-	insert into tb_movimentacao(veiculo_id, condutor_id,configuracao_id, entrada,saida,tempoMulta,tempoDesconto,
+	insert into tb_movimentacao(veiculo_id, condutor_id,Movimentacao_id, entrada,saida,tempoMulta,tempoDesconto,
 			valorDesconto,valorHoraMulta) values (2,2,1,'2023-01-02 14:10:00','2023-01-02 21:00:00',
 			'0 hours','0 hours',0,0);
-	insert into tb_movimentacao(veiculo_id, condutor_id,configuracao_id, entrada,saida,tempoMulta,tempoDesconto,
+	insert into tb_movimentacao(veiculo_id, condutor_id,Movimentacao_id, entrada,saida,tempoMulta,tempoDesconto,
 			valorDesconto,valorHoraMulta) values (1,2,1,'2023-01-03 16:10:00','2023-01-03 21:00:00',
 			'0 hours','0 hours',0,0);
-	insert into tb_movimentacao(veiculo_id, condutor_id,configuracao_id, entrada,saida,tempoMulta,tempoDesconto,
+	insert into tb_movimentacao(veiculo_id, condutor_id,Movimentacao_id, entrada,saida,tempoMulta,tempoDesconto,
 			valorDesconto,valorHoraMulta) values (3,3,1,'2023-01-29 13:20:00','2023-01-29 22:00:00',
 			'0 hours','0 hours',0,0);
 	insert into tb_movimentacao(veiculo_id, condutor_id,configuracao_id, entrada,saida,tempoMulta,tempoDesconto,
