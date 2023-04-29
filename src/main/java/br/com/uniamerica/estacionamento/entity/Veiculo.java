@@ -22,11 +22,11 @@ public class Veiculo extends AbstractEntity{
 
     @Enumerated(EnumType.STRING)
     @Getter @Setter
-    @Column(name= "cor",length = 20,nullable = false)
+    @Column(name= "cor",length = 20)
     private Cor cor;
     @Enumerated(EnumType.STRING)
     @Getter @Setter
-    @Column(name= "tipo",length = 6,nullable = false)
+    @Column(name= "tipo",length = 6)
     private Tipo tipo;
     @Getter  @Setter
     @Column(name = "ano",nullable = false)
